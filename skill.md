@@ -58,6 +58,9 @@ const JuicyButton = ({ children, onPress }) => {
   );
 };
 
+Pattern: "Animated Modals"
+For simple overlay modals, use Absolute Position + Reanimated Entry/Exit animations.
+Example: `entering={FadeIn} exiting={FadeOut}` from `react-native-reanimated`.
 
 4. Glassmorphism in React Native
 
@@ -94,3 +97,9 @@ Use expo-haptics for tactile feedback on EVERY interaction.
 Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light) for taps.
 
 Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success) for completing a habit.
+
+8. Modal Architecture (New)
+
+Avoid standard `Modal` from React Native if you want custom backdrop blurs or complex transitions.
+Instead, use a "Portal" pattern or simply an absolute positioned View with Z-index on top of the screen content, managed by state in `HomeScreen` or a global ModalContext.
+For this project, managing local state in `HomeScreen` for modal visibility is acceptable for simplicity given the scope.

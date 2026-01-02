@@ -1,21 +1,35 @@
 import React, { useState, useRef } from 'react';
-import { View, Text, ScrollView, SafeAreaView, Dimensions, Modal } from 'react-native';
+import { View, Text, SafeAreaView, Dimensions } from 'react-native';
 import { useGame } from '../context/GameContext';
 import { GlassPanel } from '../components/GlassPanel';
 import { JuicyButton } from '../components/JuicyButton';
 import { PetAvatar } from '../components/PetAvatar';
 import { ParticleSystem } from '../components/ParticleSystem';
-import { Bell, CircleDollarSign, Gift, HeartHandshake, Hand, Utensils, Smile, Wind, Armchair, Sparkles, Flame } from 'lucide-react-native';
+import { Bell, CircleDollarSign, HeartHandshake, Sparkles, Flame } from 'lucide-react-native';
 import * as Haptics from 'expo-haptics';
+
+// Modals
+import { MoodModal } from '../components/modals/MoodModal';
+import { GratitudeModal } from '../components/modals/GratitudeModal';
+import { BreathingModal } from '../components/modals/BreathingModal';
+import { ShopModal } from '../components/modals/ShopModal';
+import { ChatModal } from '../components/modals/ChatModal';
 
 const { width, height } = Dimensions.get('window');
 
 export default function HomeScreen() {
-  const { coins, streak, moodScore, logMood, interact, notifications, inventory, accessory, buyAccessory, saveGratitude, watchAd } = useGame();
+  const { coins, streak, moodScore, interact, notifications, watchAd } = useGame();
 
   const [particles, setParticles] = useState<{ id: number; x: number; y: number; type: string }[]>([]);
   const [showInteractionMenu, setShowInteractionMenu] = useState(false);
   const [interactionMenuTimer, setInteractionMenuTimer] = useState<NodeJS.Timeout | null>(null);
+
+  // Modal Visibility State
+  const [showMood, setShowMood] = useState(false);
+  const [showGratitude, setShowGratitude] = useState(false);
+  const [showBreathing, setShowBreathing] = useState(false);
+  const [showShop, setShowShop] = useState(false);
+  const [showChat, setShowChat] = useState(false);
 
   const spawnParticles = (count: number, type: string, x: number, y: number) => {
     const newParticles: { id: number; x: number; y: number; type: string }[] = [];
@@ -29,8 +43,7 @@ export default function HomeScreen() {
     setParticles(prev => prev.filter(p => p.id !== id));
   };
 
-  const handlePetPress = (event: any) => { // Using simple press for now, could be Gesture Handler tap
-    const { locationX, locationY, pageX, pageY } = event.nativeEvent;
+  const handlePetPress = (event: any) => {
     // Toggle interaction menu
     if (showInteractionMenu) {
         setShowInteractionMenu(false);
@@ -50,8 +63,14 @@ export default function HomeScreen() {
     setShowInteractionMenu(false);
   };
 
+  const handleMagic = () => {
+      // Stub for Phase 3 AI
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+      spawnParticles(15, 'sparkle', width / 2, height / 2);
+  };
+
   // Determine Background Color based on Mood
-  let bgClass = 'bg-bebek-bg'; // Default happy
+  let bgClass = 'bg-bebek-bg';
   if (moodScore > 70) bgClass = 'bg-[#E0F2FE]';
   else if (moodScore < 30) bgClass = 'bg-[#C7D2FE]';
   else bgClass = 'bg-[#ECFEFF]';
@@ -62,7 +81,7 @@ export default function HomeScreen() {
         {/* Header */}
         <View className="flex-row justify-between items-center px-6 pt-4 z-10">
            <View className="flex-row gap-2">
-              <JuicyButton className="rounded-2xl shadow-sm" onPress={() => console.log('Open Mood')}>
+              <JuicyButton className="rounded-2xl shadow-sm" onPress={() => setShowMood(true)}>
                  <GlassPanel className="p-2 px-4 rounded-2xl flex-col items-center justify-center">
                     <Text className="text-[10px] font-bold text-gray-400 uppercase tracking-widest font-ui">Mood</Text>
                     <Text className="text-2xl font-bold text-gray-800">
@@ -70,7 +89,7 @@ export default function HomeScreen() {
                     </Text>
                  </GlassPanel>
               </JuicyButton>
-              {/* Daily Affirmation / Streak Placeholder (using Gift/Flame logic if available) */}
+
               {streak > 0 && (
                 <View className="bg-orange-100 p-2 px-3 rounded-2xl border-2 border-orange-300 flex-col items-center justify-center ml-2">
                     <Text className="text-[10px] font-bold text-orange-600 uppercase tracking-widest font-ui">Streak</Text>
@@ -106,7 +125,7 @@ export default function HomeScreen() {
 
         {/* Center Area - Pet */}
         <View className="flex-1 justify-center items-center z-0 -mt-10">
-            {/* Speech Bubble (Placeholder for now) */}
+            {/* Speech Bubble */}
             <View className="absolute -top-24 bg-white border-4 border-bebek-dark px-6 py-4 rounded-3xl max-w-[85%] z-30 shadow-lg">
                 <Text className="text-xl text-bebek-dark text-center font-bold font-hand">Kwek! Apa kabar hatimu hari ini?</Text>
                 <View className="absolute -bottom-4 left-1/2 -ml-[12px] w-0 h-0 border-l-[12px] border-l-transparent border-r-[12px] border-r-transparent border-t-[12px] border-t-bebek-dark" />
@@ -115,7 +134,6 @@ export default function HomeScreen() {
 
             {/* Pet Container */}
             <View className="relative items-center justify-center">
-               {/* Interaction Menu */}
                {showInteractionMenu && (
                  <View className="absolute w-full h-48 z-40 flex-row justify-between items-center px-4 -top-8" style={{ width: 300 }}>
                     <JuicyButton onPress={() => handleInteraction('pet')} className="bg-white border-4 border-bebek-dark w-16 h-16 rounded-full items-center justify-center shadow-sm">
@@ -150,23 +168,19 @@ export default function HomeScreen() {
 
             {/* Tools Grid */}
             <View className="flex-row flex-wrap justify-center gap-4 mt-8 w-full px-4">
-               {/* Gratitude */}
-               <JuicyButton className="w-[22%] aspect-square bg-orange-100 border-b-4 border-orange-200 rounded-3xl items-center justify-center" onPress={() => console.log('Gratitude')}>
+               <JuicyButton className="w-[22%] aspect-square bg-orange-100 border-b-4 border-orange-200 rounded-3xl items-center justify-center" onPress={() => setShowGratitude(true)}>
                   <Text className="text-3xl mb-1">🍯</Text>
                   <Text className="text-[10px] font-bold text-orange-800 uppercase font-ui">Syukur</Text>
                </JuicyButton>
-               {/* Breathe */}
-               <JuicyButton className="w-[22%] aspect-square bg-teal-100 border-b-4 border-teal-200 rounded-3xl items-center justify-center" onPress={() => console.log('Breathe')}>
+               <JuicyButton className="w-[22%] aspect-square bg-teal-100 border-b-4 border-teal-200 rounded-3xl items-center justify-center" onPress={() => setShowBreathing(true)}>
                   <Text className="text-3xl mb-1">🌬️</Text>
                   <Text className="text-[10px] font-bold text-teal-800 uppercase font-ui">Napas</Text>
                </JuicyButton>
-               {/* Shop */}
-               <JuicyButton className="w-[22%] aspect-square bg-pink-100 border-b-4 border-pink-200 rounded-3xl items-center justify-center" onPress={() => console.log('Shop')}>
+               <JuicyButton className="w-[22%] aspect-square bg-pink-100 border-b-4 border-pink-200 rounded-3xl items-center justify-center" onPress={() => setShowShop(true)}>
                   <Text className="text-3xl mb-1">🛋️</Text>
                   <Text className="text-[10px] font-bold text-pink-800 uppercase font-ui">Pojok</Text>
                </JuicyButton>
-               {/* Magic */}
-               <JuicyButton className="w-[22%] aspect-square bg-purple-100 border-b-4 border-purple-200 rounded-3xl items-center justify-center" onPress={() => console.log('Magic')}>
+               <JuicyButton className="w-[22%] aspect-square bg-purple-100 border-b-4 border-purple-200 rounded-3xl items-center justify-center" onPress={handleMagic}>
                   <Sparkles size={28} color="#6B21A8" className="mb-1" />
                   <Text className="text-[10px] font-bold text-purple-800 uppercase font-ui">Saran</Text>
                </JuicyButton>
@@ -175,7 +189,10 @@ export default function HomeScreen() {
 
         {/* Footer */}
         <View className="px-6 pb-6 pt-2">
-            <JuicyButton className="bg-white border-b-8 border-r-4 border-gray-200 h-20 rounded-3xl flex-row items-center justify-center gap-4 w-full">
+            <JuicyButton
+                onPress={() => setShowChat(true)}
+                className="bg-white border-b-8 border-r-4 border-gray-200 h-20 rounded-3xl flex-row items-center justify-center gap-4 w-full"
+            >
                 <View className="bg-sky-100 p-2 rounded-2xl">
                    <HeartHandshake size={32} color="#0284c7" />
                 </View>
@@ -189,6 +206,14 @@ export default function HomeScreen() {
         </View>
 
         <ParticleSystem particles={particles} onComplete={handleParticleComplete} />
+
+        {/* Modals */}
+        <MoodModal visible={showMood} onClose={() => setShowMood(false)} />
+        <GratitudeModal visible={showGratitude} onClose={() => setShowGratitude(false)} />
+        <BreathingModal visible={showBreathing} onClose={() => setShowBreathing(false)} />
+        <ShopModal visible={showShop} onClose={() => setShowShop(false)} />
+        <ChatModal visible={showChat} onClose={() => setShowChat(false)} />
+
       </SafeAreaView>
     </View>
   );

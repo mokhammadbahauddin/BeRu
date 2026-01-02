@@ -138,10 +138,22 @@ Animates Opacity (1->0) and TranslateY (upwards).
 
 5. Development Phases
 
-Phase 1: Setup & Porting: Initialize Expo, install NativeWind, replicate the index.html layout structure in React Native <View>s.
+Phase 1: Setup & Porting [COMPLETED]
+- Project structure set up with NativeWind, Reanimated, Expo Fonts.
+- Core components: `GlassPanel`, `JuicyButton`, `PetAvatar`, `ParticleSystem`.
+- `GameContext` implemented with persistence.
+- `HomeScreen` basic layout and mood state background.
 
-Phase 2: The Duck Engine: Implement the Context API (PetContext) to handle state (Mood, Coins, Inventory).
+Phase 2: The Tools (UI & Logic) [CURRENT]
+- Implementation of interactive Modals for core features.
+- Mood Check-in Modal (Grid of emojis).
+- Gratitude Jar Modal (Input & List).
+- Breathing Exercise Modal (Animation Overlay).
+- Shop/Inventory Modal (Accessory purchasing & equipping).
+- Chat Modal UI (Placeholder).
+- Connect `HomeScreen` buttons to these Modals.
 
-Phase 3: The Tools: Build the Mood Tracker, Gratitude, and Breathing modules.
-
-Phase 4: AI & Juice: Connect Gemini API and add Reanimated animations + Sound Effects (Expo AV).
+Phase 3: AI & Juice
+- Connect Gemini API to Mood Check-in, Magic Activity, and Chat.
+- Polish animations (confetti, more complex particles).
+- Add sound effects (Expo AV).
