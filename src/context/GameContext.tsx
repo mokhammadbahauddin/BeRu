@@ -2,11 +2,15 @@ import React, { createContext, useState, useEffect, useContext } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { GameState, GameContextType, Notification } from '../types';
 import { playSound, loadSounds } from '../services/audio';
-import { initAI, getMoodResponse } from '../services/ai';
+import { initAI, getMoodResponse, getMagicActivity } from '../services/ai';
 
 const STATE_KEY = 'bebek_mental_health_v4_ultra';
 
-const defaultState: GameState = {
+interface ExtendedGameState extends GameState {
+    firstTimeUser?: boolean;
+}
+
+const defaultState: ExtendedGameState = {
   coins: 0,
   streak: 0,
   moodScore: 50,
@@ -15,14 +19,17 @@ const defaultState: GameState = {
   lastDaily: 0,
   gratitudeList: [],
   lastMoodCheckin: 0,
-  notifications: []
+  notifications: [],
+  firstTimeUser: true
 };
 
-// Add speech bubble to context type temporarily or manage local state?
-// PRD says "Global UI State: Consider moving the Speech Bubble text into GameContext"
 interface ExtendedGameContextType extends GameContextType {
     speechText: string;
     setSpeechText: (text: string) => void;
+    magicActivity: () => void;
+    resetData: () => void;
+    firstTimeUser: boolean;
+    completeOnboarding: () => void;
 }
 
 const GameContext = createContext<ExtendedGameContextType | undefined>(undefined);
@@ -36,7 +43,7 @@ export const useGame = () => {
 };
 
 export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [state, setState] = useState<GameState>(defaultState);
+  const [state, setState] = useState<ExtendedGameState>(defaultState);
   const [loaded, setLoaded] = useState(false);
   const [speechText, setSpeechText] = useState("Kwek! Apa kabar hatimu?");
 
@@ -73,6 +80,16 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
+  const resetData = async () => {
+      await AsyncStorage.removeItem(STATE_KEY);
+      setState(defaultState);
+      setSpeechText("Kwek! Mari mulai lembaran baru.");
+  };
+
+  const completeOnboarding = () => {
+      setState(prev => ({ ...prev, firstTimeUser: false }));
+  };
+
   const addNotification = (msg: string) => {
     setState(prev => {
       const newNotifs = [{ id: Date.now(), text: msg, read: false }, ...prev.notifications].slice(0, 5);
@@ -99,6 +116,14 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setSpeechText("Hmm... sebentar ya...");
     const reply = await getMoodResponse(label, score);
     setSpeechText(reply);
+  };
+
+  const magicActivity = async () => {
+      playSound('pop');
+      setSpeechText("Mencari ide seru...");
+      const activity = await getMagicActivity(state.moodScore);
+      setSpeechText(`💡 ${activity}`);
+      addNotification(`Saran: ${activity}`);
   };
 
   const buyAccessory = (item: string, cost: number): boolean => {
@@ -180,6 +205,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
   return (
     <GameContext.Provider value={{
       ...state,
+      firstTimeUser: state.firstTimeUser ?? true,
       addNotification,
       logMood,
       buyAccessory,
@@ -188,7 +214,10 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
       claimDaily,
       watchAd,
       speechText,
-      setSpeechText
+      setSpeechText,
+      magicActivity,
+      resetData,
+      completeOnboarding
     }}>
       {children}
     </GameContext.Provider>

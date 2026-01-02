@@ -150,11 +150,14 @@ Phase 2: The Tools (UI & Logic) [COMPLETED]
 - Interactive Modals for Mood, Gratitude, Breathing, Shop, Chat implemented.
 - State connection for buying items and logging mood.
 - Shop logic exists (data persistence).
-- [Fix Needed]: Visual representation of accessories on Pet.
 
-Phase 3: AI & Juice [CURRENT]
-- Setup `src/services/ai.ts` with Gemini.
-- Connect AI to Mood Check-in (Speech Bubble response).
-- Connect AI to Chat Modal (Interactive conversation).
-- Setup `expo-av` for Sound Effects (Tap, Coin, Success).
-- Implement Accessory rendering on `PetAvatar`.
+Phase 3: AI & Juice [COMPLETED]
+- Gemini AI integration for Chat and Mood responses.
+- Sound Effects via Expo AV.
+- Visual polish (Accessory rendering).
+
+Phase 4: Polish & Refactor [CURRENT]
+- Refactor `HomeScreen` into sub-components (`HomeHeader`, `PetDisplay`, `ToolsGrid`).
+- Implement "Magic Activity" (Saran) logic with AI.
+- Implement Onboarding flow (First time user welcome).
+- Add Settings Modal (Reset Data).
