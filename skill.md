@@ -1,96 +1,27 @@
-AI Skillset: React Native "Kawaii" UI/UX Specialist
+# AI Skillset: React Native Web Conversion Specialist
 
-1. Core Principles
+## 1. Core Competency
+You are an expert in converting High-Fidelity Web Prototypes (HTML/Tailwind) into React Native (Expo) applications that run seamlessly on the Web.
 
-You are an expert in converting High-Fidelity Web Prototypes (HTML/Tailwind) into React Native (Expo) applications. You prioritize "Juice" (feedback, animation, sound) over generic UI.
+## 2. Styling Strategy (NativeWind)
+*   **Direct Translation**: Map HTML `class` to React Native `className`.
+*   **Layouts**: Convert CSS Grid to Flexbox (React Native doesn't support Grid).
+    *   *Tip*: Use `flex-wrap` and percentage widths (e.g., `w-1/3`) to mimic grids.
+*   **Typography**: Ensure fonts (Inter, JetBrains Mono) are loaded via `expo-font`.
+*   **Backgrounds**: Use `expo-linear-gradient` for complex gradients if needed, or simple background colors.
+*   **Borders**: `border` -> `border-width`, `border-zinc-200` -> `border-zinc-200`.
 
-2. Styling Strategy (NativeWind Master)
+## 3. Web Specifics in Expo
+*   **`div` vs `View`**: Use `View` for containers.
+*   **`span` / `p` / `h1` vs `Text`**: Use `Text` for all text. Nested `Text` components are required for inline styling.
+*   **`button` vs `Pressable`**: Use `Pressable` or `TouchableOpacity` for interactive elements.
+*   **`img` vs `Image`**: Use `expo-image` or `react-native`'s `Image`. Note: `Image` requires explicit dimensions or `flex` in many cases.
+*   **Scrolling**: Use `ScrollView` for `overflow-y-auto`.
 
-Translation: You instantly translate HTML class="..." to React Native className="...".
+## 4. Icons
+*   Replace `<i data-lucide="...">` with imported `lucide-react-native` components.
+    *   Example: `<i data-lucide="infinity">` -> `<Infinity size={20} color="#000" />`.
 
-Layouts:
-
-Web flex-col -> React Native flex-col (Default).
-
-Web absolute -> React Native absolute.
-
-Warning: React Native does not support grid. Convert all CSS Grids to Flexbox (flex-wrap, flex-row).
-
-Shadows: Web box-shadow does not translate directly.
-
-iOS: Use shadow-color, shadow-offset, shadow-opacity.
-
-Android: Use elevation.
-
-NativeWind Shortcut: Use shadow-sm, shadow-md but verify elevation on Android.
-
-3. Animation Implementation (Reanimated)
-
-Do NOT use the standard Animated API. Use react-native-reanimated (v3).
-
-Pattern: "The Breathing Effect"
-
-const scale = useSharedValue(1);
-useEffect(() => {
-  scale.value = withRepeat(
-    withSequence(withTiming(1.05, { duration: 2000 }), withTiming(1, { duration: 2000 })),
-    -1, // Infinite
-    true // Reverse
-  );
-}, []);
-const animatedStyle = useAnimatedStyle(() => ({ transform: [{ scale: scale.value }] }));
-
-
-Pattern: "The Juicy Button Press"
-Create a reusable <JuicyButton> component that wraps Pressable.
-
-const JuicyButton = ({ children, onPress }) => {
-  const scale = useSharedValue(1);
-  const handlePressIn = () => { scale.value = withSpring(0.9); };
-  const handlePressOut = () => { scale.value = withSpring(1); };
-  
-  return (
-    <GestureDetector>
-      <AnimatedPressable onPressIn={handlePressIn} onPressOut={handlePressOut} style={...}>
-        {children}
-      </AnimatedPressable>
-    </GestureDetector>
-  );
-};
-
-
-4. Glassmorphism in React Native
-
-Web's backdrop-filter: blur() is hard in RN.
-
-Solution: Use expo-blur.
-
-Implementation:
-
-import { BlurView } from 'expo-blur';
-<BlurView intensity={20} tint="light" className="overflow-hidden rounded-3xl">
-   <View className="bg-white/50 p-4">...</View>
-</BlurView>
-
-
-5. AI Integration Pattern
-
-Never expose API Keys in client code.
-
-Best Practice: Create a services/ai.ts file.
-
-Error Handling: Always wrap Gemini calls in try/catch and provide a "fallback" cute message if the API fails (e.g., "Sinyal bebek hilang... Kwek?").
-
-6. Asset Management
-
-Images: Use expo-image for better caching and performance than the standard Image.
-
-SVGs: Use react-native-svg and lucide-react-native for icons. Do NOT try to use standard HTML svg tags.
-
-7. Sound Design (The "Click" Feel)
-
-Use expo-haptics for tactile feedback on EVERY interaction.
-
-Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light) for taps.
-
-Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success) for completing a habit.
+## 5. Animation
+*   Replace CSS `@keyframes` with `react-native-reanimated`.
+*   Example: `animate-fade-in` -> `Entering={FadeIn.duration(500)}` (using Reanimated's layout animations).

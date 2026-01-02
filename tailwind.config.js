@@ -4,21 +4,11 @@ module.exports = {
   theme: {
     extend: {
       fontFamily: {
-        pixel: ['VT323_400Regular'],
-        ui: ['Quicksand_500Medium'],
-        cute: ['Fredoka_400Regular'],
-        hand: ['PatrickHand_400Regular']
+        sans: ['Inter_400Regular'],
+        mono: ['JetBrainsMono_400Regular'],
       },
       colors: {
-        bebek: {
-          bg: '#E0F2FE',
-          primary: '#38BDF8',
-          dark: '#0C4A6E',
-          accent: '#F472B6',
-          action: '#FDE047',
-          calm: '#A7F3D0',
-          surface: '#ffffff'
-        }
+        // Zinc colors are default in Tailwind but ensuring they are available
       },
     },
   },
