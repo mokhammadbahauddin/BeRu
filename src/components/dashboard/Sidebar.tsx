@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, Pressable, ScrollView, Image, Platform } from 'react-native';
+import { View, Text, Pressable, ScrollView } from 'react-native';
 import {
   Infinity as InfinityIcon,
   PlusCircle,
@@ -11,6 +11,7 @@ import {
   FolderClosed,
   Settings
 } from 'lucide-react-native';
+import { useApp } from '../../context/AppContext';
 
 type TabId = 'home' | 'history' | 'templates' | 'analytics' | 'seo' | 'settings';
 
@@ -20,6 +21,7 @@ interface SidebarProps {
 }
 
 export default function Sidebar({ activeTab, onSwitchTab }: SidebarProps) {
+  const { credits } = useApp();
 
   const NavItem = ({ id, icon: Icon, label, badge }: { id: TabId, icon: any, label: string, badge?: boolean }) => {
     const isActive = activeTab === id;
@@ -90,10 +92,10 @@ export default function Sidebar({ activeTab, onSwitchTab }: SidebarProps) {
         <View className="mb-4">
           <View className="flex-row items-center justify-between mb-1.5">
             <Text className="text-[11px] font-medium text-zinc-600">Credits Used</Text>
-            <Text className="text-[11px] font-mono text-zinc-500">850/1000</Text>
+            <Text className="text-[11px] font-mono text-zinc-500">{credits}/1000</Text>
           </View>
           <View className="w-full bg-zinc-200 rounded-full h-1.5 overflow-hidden">
-            <View className="bg-zinc-800 h-full rounded-full w-[85%]" />
+            <View className="bg-zinc-800 h-full rounded-full" style={{ width: `${(credits / 1000) * 100}%` }} />
           </View>
         </View>
 

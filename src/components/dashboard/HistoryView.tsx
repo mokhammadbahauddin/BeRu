@@ -1,15 +1,11 @@
 import React from 'react';
 import { View, Text, ScrollView, TextInput, Pressable } from 'react-native';
 import { Search, Video, Mic, FileText, MoreHorizontal } from 'lucide-react-native';
-
-const HISTORY_DATA = [
-    { id: 1, name: "Alex Hormozi - $100M Leads", source: "YouTube", platform: "LinkedIn", status: "Published", date: "2 hours ago", type: "video" },
-    { id: 2, name: "MKBHD - iPhone 15 Review", source: "YouTube", platform: "Blog", status: "Draft", date: "1 day ago", type: "video" },
-    { id: 3, name: "Q4 Marketing Strategy", source: "Upload", platform: "Summary", status: "Completed", date: "3 days ago", type: "file" },
-    { id: 4, name: "Lex Fridman #302", source: "Podcast", platform: "Twitter", status: "Scheduled", date: "5 days ago", type: "audio" },
-];
+import { useApp } from '../../context/AppContext';
 
 export default function HistoryView() {
+  const { history } = useApp();
+
   return (
     <ScrollView className="flex-1 bg-white p-6">
         <View className="max-w-6xl mx-auto w-full">
@@ -29,7 +25,7 @@ export default function HistoryView() {
                     <Text className="flex-1 text-sm font-medium text-zinc-500">Status</Text>
                     <Text className="w-10 text-right text-sm font-medium text-zinc-500">Action</Text>
                 </View>
-                {HISTORY_DATA.map((item) => (
+                {history.map((item) => (
                     <View key={item.id} className="flex-row items-center px-6 py-4 border-b border-zinc-50 hover:bg-zinc-50">
                         <View className="flex-[2] flex-row items-center gap-3">
                             <View className="w-8 h-8 rounded bg-zinc-100 items-center justify-center">
@@ -42,9 +38,9 @@ export default function HistoryView() {
                         <Text className="flex-1 text-sm text-zinc-500">{item.source}</Text>
                         <Text className="flex-1 text-sm text-zinc-500">{item.date}</Text>
                         <View className="flex-1 flex-row">
-                            <View className={`px-2.5 py-0.5 rounded-full border flex-row items-center gap-1.5 ${item.status === 'Published' ? 'bg-green-50 border-green-200' : 'bg-zinc-100 border-zinc-200'}`}>
-                                <View className={`w-1.5 h-1.5 rounded-full ${item.status === 'Published' ? 'bg-green-500' : 'bg-zinc-400'}`} />
-                                <Text className={`text-xs font-medium ${item.status === 'Published' ? 'text-green-700' : 'text-zinc-600'}`}>{item.status}</Text>
+                            <View className={`px-2.5 py-0.5 rounded-full border flex-row items-center gap-1.5 ${item.status === 'Published' ? 'bg-green-50 border-green-200' : item.status === 'Completed' ? 'bg-blue-50 border-blue-200' : 'bg-zinc-100 border-zinc-200'}`}>
+                                <View className={`w-1.5 h-1.5 rounded-full ${item.status === 'Published' ? 'bg-green-500' : item.status === 'Completed' ? 'bg-blue-500' : 'bg-zinc-400'}`} />
+                                <Text className={`text-xs font-medium ${item.status === 'Published' ? 'text-green-700' : item.status === 'Completed' ? 'text-blue-700' : 'text-zinc-600'}`}>{item.status}</Text>
                             </View>
                         </View>
                         <Pressable className="w-10 items-end">

@@ -7,10 +7,11 @@ import LandingScreen from './src/screens/LandingScreen';
 import DashboardScreen from './src/screens/DashboardScreen';
 import { useFonts, Inter_400Regular, Inter_500Medium, Inter_600SemiBold, Inter_700Bold } from '@expo-google-fonts/inter';
 import { JetBrainsMono_400Regular, JetBrainsMono_500Medium } from '@expo-google-fonts/jetbrains-mono';
+import { NativeWindStyleSheet } from "nativewind";
+import { AppProvider } from './src/context/AppContext';
+import ToastContainer from './src/components/ToastContainer';
 
 // IMPORTANT: This import is required for NativeWind to work on Web
-import { NativeWindStyleSheet } from "nativewind";
-
 NativeWindStyleSheet.setOutput({
   default: "native",
 });
@@ -32,12 +33,15 @@ export default function App() {
   }
 
   return (
-    <NavigationContainer>
-      <StatusBar style="dark" />
-      <Stack.Navigator screenOptions={{ headerShown: false, animationEnabled: false }}>
-        <Stack.Screen name="Landing" component={LandingScreen} />
-        <Stack.Screen name="Dashboard" component={DashboardScreen} />
-      </Stack.Navigator>
-    </NavigationContainer>
+    <AppProvider>
+      <NavigationContainer>
+        <StatusBar style="dark" />
+        <Stack.Navigator screenOptions={{ headerShown: false, animationEnabled: false }}>
+          <Stack.Screen name="Landing" component={LandingScreen} />
+          <Stack.Screen name="Dashboard" component={DashboardScreen} />
+        </Stack.Navigator>
+        <ToastContainer />
+      </NavigationContainer>
+    </AppProvider>
   );
 }

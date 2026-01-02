@@ -5,49 +5,17 @@ import {
   Bold, Italic, Link2, Check, Copy, Download, Layout, Loader2
 } from 'lucide-react-native';
 import Animated, { FadeIn, FadeInDown, useAnimatedStyle, useSharedValue, withRepeat, withTiming, Easing } from 'react-native-reanimated';
-
-// Mock Content
-const CONTENT_MOCK = {
-    summary: `## The Psychology of Commitment: An Analysis
-
-Rick Astley's "Never Gonna Give You Up" isn't just a meme; it's a masterclass in establishing trust. In a business context, the lyrics map perfectly to Service Level Agreements (SLAs).
-
-### Key Takeaways
-*   **Reliability:** "Never gonna let you down" speaks to uptime and consistency.
-*   **Transparency:** "Inside we both know what's been going on" creates authentic connection.
-*   **Long-term Vision:** "We've known each other for so long" emphasizes LTV (Lifetime Value).
-
-> "A full commitment's what I'm thinking of / You wouldn't get this from any other guy" — This is your Unique Selling Proposition (USP).`,
-    linkedin: `Stop overcomplicating customer success. 🛑
-
-I just revisited a classic piece of media from 1987, and it teaches us more about retention than any SaaS playbook.
-
-Rick Astley’s specific promises constitute the perfect SLA:
-1️⃣ "Never gonna give you up" (Churn prevention)
-2️⃣ "Never gonna let you down" (Reliability)
-3️⃣ "Never gonna run around" (Focus)
-
-Most companies fail at #2, which makes #1 impossible.
-
-**The lesson?** Don't innovate on trust. Be boringly reliable.
-
-👇 How do you define reliability in your niche?
-
-#CustomerSuccess #SaaS #Growth #BusinessStrategy`,
-    twitter: `1/ Why Rick Astley is a better business coach than your MBA professor. 🧵
-
-2/ "We're no strangers to love / You know the rules and so do I"
-Lesson: Set clear expectations immediately. Onboarding is everything.
-
-3/ "A full commitment's what I'm thinking of"
-In a world of short-term hacks, long-term commitment is the ultimate moat.`
-};
+import { generateContent, ContentFormat } from '../../services/ai';
+import { useApp } from '../../context/AppContext';
 
 export default function HomeView() {
+  const { deductCredits, addToHistory, showToast } = useApp();
   const [url, setUrl] = useState('https://youtube.com/watch?v=dQw4w9WgXcQ');
   const [isGenerating, setIsGenerating] = useState(false);
   const [generated, setGenerated] = useState(false);
-  const [mode, setMode] = useState<'summary' | 'linkedin' | 'twitter'>('summary');
+  const [content, setContent] = useState('');
+  const [mode, setMode] = useState<ContentFormat>('summary');
+  const [tone, setTone] = useState('Professional & Authoritative');
   const [showSave, setShowSave] = useState(false);
 
   // Marquee Animation for loading
@@ -56,27 +24,64 @@ export default function HomeView() {
     transform: [{ translateX: marqueeX.value }]
   }));
 
-  const handleGenerate = () => {
-    if (!url) return;
+  const handleGenerate = async () => {
+    if (!url) {
+        showToast("Please enter a valid URL", "error");
+        return;
+    }
+
+    if (!deductCredits(50)) {
+        showToast("Not enough credits!", "error");
+        return;
+    }
+
     setIsGenerating(true);
     setGenerated(false);
 
     // Start marquee
     marqueeX.value = withRepeat(withTiming(-100, { duration: 1000, easing: Easing.linear }), -1, false);
 
-    setTimeout(() => {
-      setIsGenerating(false);
-      setGenerated(true);
-      setShowSave(true);
-      setTimeout(() => setShowSave(false), 2000);
-    }, 2500);
+    try {
+        const result = await generateContent({ url, format: mode, tone, creativity: 0.7 });
+        setContent(result);
+        setGenerated(true);
+        setShowSave(true);
+        showToast("Content generated successfully", "success");
+
+        // Add to history
+        addToHistory({
+            name: "Generated Project", // In real app, fetch video title
+            source: "YouTube",
+            platform: mode.charAt(0).toUpperCase() + mode.slice(1),
+            status: "Completed",
+            type: "video"
+        });
+
+        setTimeout(() => setShowSave(false), 3000);
+    } catch (error) {
+        showToast("Failed to generate content", "error");
+    } finally {
+        setIsGenerating(false);
+    }
+  };
+
+  const handleModeChange = async (newMode: ContentFormat) => {
+      setMode(newMode);
+      if (generated) {
+          // Re-generate if already generated (simulate "Translate" or "Repurpose")
+          // In a real app, we might just switch tabs if we generated all at once,
+          // or call API again for the specific format.
+          setIsGenerating(true);
+          const result = await generateContent({ url, format: newMode, tone, creativity: 0.7 });
+          setContent(result);
+          setIsGenerating(false);
+      }
   };
 
   const renderContent = () => {
-     const content = CONTENT_MOCK[mode];
      return content.split('\n\n').map((block, i) => (
         <Text key={i} className="text-zinc-600 text-sm leading-7 mb-4">
-            {block}
+            {block.replace(/#/g, '')}
         </Text>
      ));
   };
@@ -90,7 +95,7 @@ export default function HomeView() {
         <View className="w-full md:w-[400px] bg-white border-r border-zinc-200 flex-col z-10 shadow-sm">
             <View className="h-14 border-b border-zinc-100 flex-row items-center px-6 justify-between flex-shrink-0">
                 <Text className="font-semibold text-sm text-zinc-900">Project Setup</Text>
-                <Pressable><Text className="text-xs text-zinc-400 hover:text-zinc-900 underline">Reset</Text></Pressable>
+                <Pressable onPress={() => { setUrl(''); setGenerated(false); }}><Text className="text-xs text-zinc-400 hover:text-zinc-900 underline">Reset</Text></Pressable>
             </View>
 
             <ScrollView className="flex-1 p-6" contentContainerStyle={{ gap: 24 }}>
@@ -166,7 +171,7 @@ export default function HomeView() {
                     <View>
                         <Text className="text-xs font-medium text-zinc-700 mb-2">Brand Voice</Text>
                         <View className="w-full px-3 py-2 bg-zinc-50 border border-zinc-200 rounded-lg">
-                            <Text className="text-sm text-zinc-700">Professional & Authoritative</Text>
+                            <Text className="text-sm text-zinc-700">{tone}</Text>
                         </View>
                     </View>
                  </View>
@@ -193,7 +198,7 @@ export default function HomeView() {
                         {(['summary', 'linkedin', 'twitter'] as const).map((m) => (
                             <Pressable
                                 key={m}
-                                onPress={() => setMode(m)}
+                                onPress={() => handleModeChange(m)}
                                 className={`px-3 py-1.5 rounded-md ${mode === m ? 'bg-white shadow-sm' : ''}`}
                             >
                                 <Text className={`text-xs font-medium ${mode === m ? 'text-zinc-900' : 'text-zinc-500'}`}>
