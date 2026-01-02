@@ -1,47 +1,50 @@
-# Product Requirements Document (PRD): ViralLoop - Content Repurposing Engine
+# Product Requirements Document (PRD): ViralLoop - Enterprise Content Engine
 
 ## 1. Product Vision
-ViralLoop is a content repurposing engine designed to help creators turn one piece of long-form content (YouTube video) into a week's worth of high-engagement social media posts. The goal is to stop summarizing and start repurposing.
+ViralLoop Enterprise is a Gen-2 content repurposing engine designed for marketing teams. It transforms video content into revenue-generating assets with a focus on scale, brand consistency, and performance prediction.
 
 ## 2. Technical Foundation
 *   **Framework**: React Native (Expo SDK 51+) targeting Web.
 *   **Language**: TypeScript.
-*   **Styling**: NativeWind (Tailwind CSS).
+*   **Styling**: NativeWind (Tailwind CSS) with custom animations.
 *   **Icons**: `lucide-react-native`.
-*   **Navigation**: `react-navigation` (or simple state-based switching for MVP).
-*   **AI Engine**: Google Gemini API (via `src/services/ai.ts`).
+*   **Navigation**: `react-navigation` (Stack) + Custom Tab Switching for Dashboard.
+*   **State Management**: Local State / Context for Dashboard Tabs.
 
 ## 3. Feature Specifications
 
-### A. Landing Page
-*   **Hero Section**: Strong value proposition ("Stop Summarizing. Start Repurposing.").
-*   **Call to Action**: "Get Started" / "Try ViralLoop Free" buttons leading to the Dashboard.
-*   **Features Grid**: Highlighting "LinkedIn Ghostwriter", "Thread Weaver", and "SEO Blog Builder".
-*   **Visuals**: Clean, monochrome aesthetic (Zinc/White/Black) with a grid background.
+### A. Landing Page (Enterprise)
+*   **Hero**: "Gen-2 Engine Live" badge, gradient blobs, and high-fidelity dashboard mockup.
+*   **Social Proof**: "Trusted By" section with monochrome logos.
+*   **Features**: Bento Grid layout highlighting "Instant Repurposing", "Contextual AI", "Tone Matching", and "Performance Prediction".
+*   **Footer**: Comprehensive sitemap and legal links.
 
-### B. Dashboard
-*   **Input**: URL Input for YouTube videos.
-*   **Video Context**: Display thumbnail and metadata of the processed video.
-*   **Editor Toolbar**: Tabs to switch between output modes (Summary, LinkedIn, Twitter, Blog).
-*   **Content Area**: Markdown rendering of the generated content.
-*   **Action Buttons**: Copy to Clipboard, Regenerate.
+### B. Dashboard Shell
+*   **Sidebar**: Persistent navigation with groups (Main, Intelligence, Workspace).
+*   **User Profile**: Credits usage indicator and profile dropdown.
+*   **Tabs**: Home, History, Templates, Analytics, SEO, Team, Assets, Settings.
 
-### C. Content Generation Modes (AI)
-1.  **Summary**: Key insights and structured takeaways.
-2.  **LinkedIn**: Viral hook + "Meat and Potatoes" value + Engagement question.
-3.  **Twitter**: Thread format (1/x, 2/x) with clear lessons.
-4.  **Blog**: H1/H2 structured article for SEO.
+### C. Dashboard Views
+1.  **Home (Generator)**:
+    *   **Configuration Panel**: URL input, Video Preview, Content Format checkboxes (LinkedIn, X, Blog), Creativity Slider, Tone Selector.
+    *   **Editor Workspace**: Rich text toolbar, empty state, loading state with skeleton UI, and generated content area.
+2.  **Analytics**:
+    *   **Stats Cards**: Impressions, CTR, Read Time, Generated Post count.
+    *   **Engagement Chart**: Visual bar chart representation.
+    *   **Top Content**: List of best-performing generated assets.
+3.  **Settings**:
+    *   **Profile**: Avatar, Name, Email.
+    *   **Preferences**: Notification and Auto-save toggles.
+4.  **History**: Data table of past projects with status indicators.
+5.  **Templates**: Grid of pre-configured content frameworks (e.g., "Viral Storytelling", "SEO Deep Dive").
 
 ## 4. Design System
-*   **Font**: Inter (Sans-serif) and JetBrains Mono (Monospace).
-*   **Colors**: Zinc (Greyscale) palette.
-    *   Primary: Zinc-900 (Black).
-    *   Background: Zinc-50.
-    *   Card: White with Zinc-200 border.
-*   **Components**: "Vertex" Design System (Sharp corners or slight rounding, clean borders, shadow-sm).
+*   **Visuals**: "Glassmorphism" (blur effects), Grid backgrounds, delicate borders (Zinc-200).
+*   **Animation**: `Entering` animations (Fade/Slide), Shimmer loading effects, Marquee progress bars.
+*   **Typography**: Inter (Sans) and JetBrains Mono (Code/Technical data).
 
 ## 5. Development Phases
-1.  **Setup**: Configure Expo for Web and NativeWind.
-2.  **UI Porting**: Convert HTML/Tailwind reference to React Native components.
-3.  **Logic Integration**: Implement state for switching views and mocking generation.
-4.  **AI Integration**: Connect Gemini API for real content generation.
+1.  **Structure**: Scaffold component hierarchy for the complex dashboard.
+2.  **Landing**: Implement the high-fidelity marketing page.
+3.  **Dashboard Core**: Implement the Sidebar and Home View logic.
+4.  **Secondary Views**: Implement Analytics, Settings, etc.
