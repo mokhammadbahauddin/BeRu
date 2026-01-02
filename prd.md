@@ -56,6 +56,8 @@ Tap: Triggers animate-bounce + spawns heart particles.
 
 Long Press: Opens the "Interaction Menu" (Pet, Feed, Hug).
 
+Accessory Layer: Must render equipped items (Hat, Scarf, etc.) on top of the pet.
+
 B. Gamification Economy (The "Addiction" Loop)
 
 Currency: Coins (Koin).
@@ -144,16 +146,15 @@ Phase 1: Setup & Porting [COMPLETED]
 - `GameContext` implemented with persistence.
 - `HomeScreen` basic layout and mood state background.
 
-Phase 2: The Tools (UI & Logic) [CURRENT]
-- Implementation of interactive Modals for core features.
-- Mood Check-in Modal (Grid of emojis).
-- Gratitude Jar Modal (Input & List).
-- Breathing Exercise Modal (Animation Overlay).
-- Shop/Inventory Modal (Accessory purchasing & equipping).
-- Chat Modal UI (Placeholder).
-- Connect `HomeScreen` buttons to these Modals.
+Phase 2: The Tools (UI & Logic) [COMPLETED]
+- Interactive Modals for Mood, Gratitude, Breathing, Shop, Chat implemented.
+- State connection for buying items and logging mood.
+- Shop logic exists (data persistence).
+- [Fix Needed]: Visual representation of accessories on Pet.
 
-Phase 3: AI & Juice
-- Connect Gemini API to Mood Check-in, Magic Activity, and Chat.
-- Polish animations (confetti, more complex particles).
-- Add sound effects (Expo AV).
+Phase 3: AI & Juice [CURRENT]
+- Setup `src/services/ai.ts` with Gemini.
+- Connect AI to Mood Check-in (Speech Bubble response).
+- Connect AI to Chat Modal (Interactive conversation).
+- Setup `expo-av` for Sound Effects (Tap, Coin, Success).
+- Implement Accessory rendering on `PetAvatar`.

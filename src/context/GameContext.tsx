@@ -1,6 +1,8 @@
 import React, { createContext, useState, useEffect, useContext } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { GameState, GameContextType, Notification } from '../types';
+import { playSound, loadSounds } from '../services/audio';
+import { initAI, getMoodResponse } from '../services/ai';
 
 const STATE_KEY = 'bebek_mental_health_v4_ultra';
 
@@ -16,7 +18,14 @@ const defaultState: GameState = {
   notifications: []
 };
 
-const GameContext = createContext<GameContextType | undefined>(undefined);
+// Add speech bubble to context type temporarily or manage local state?
+// PRD says "Global UI State: Consider moving the Speech Bubble text into GameContext"
+interface ExtendedGameContextType extends GameContextType {
+    speechText: string;
+    setSpeechText: (text: string) => void;
+}
+
+const GameContext = createContext<ExtendedGameContextType | undefined>(undefined);
 
 export const useGame = () => {
   const context = useContext(GameContext);
@@ -29,9 +38,12 @@ export const useGame = () => {
 export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [state, setState] = useState<GameState>(defaultState);
   const [loaded, setLoaded] = useState(false);
+  const [speechText, setSpeechText] = useState("Kwek! Apa kabar hatimu?");
 
   useEffect(() => {
     loadState();
+    loadSounds();
+    initAI();
   }, []);
 
   useEffect(() => {
@@ -68,7 +80,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     });
   };
 
-  const logMood = (score: number) => {
+  const logMood = async (score: number) => {
     setState(prev => ({
       ...prev,
       moodScore: score,
@@ -77,6 +89,16 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
       coins: prev.coins + 20
     }));
     addNotification("Mood check-in saved! +20 coins");
+    playSound('coin');
+
+    // AI Response
+    let label = 'Neutral';
+    if(score > 70) label = 'Happy';
+    if(score < 30) label = 'Sad';
+
+    setSpeechText("Hmm... sebentar ya...");
+    const reply = await getMoodResponse(label, score);
+    setSpeechText(reply);
   };
 
   const buyAccessory = (item: string, cost: number): boolean => {
@@ -86,6 +108,8 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
             ...prev,
             accessory: prev.accessory === item ? 'none' : item
         }));
+        playSound('pop');
+        setSpeechText(state.accessory === item ? "Dilepas dulu ya." : "Wah, pas banget!");
         return true;
     }
 
@@ -96,6 +120,8 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
         inventory: [...prev.inventory, item],
         accessory: item
       }));
+      playSound('success');
+      setSpeechText("Makasih! Aku suka ini!");
       return true;
     }
     return false;
@@ -108,6 +134,8 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
       gratitudeList: [text.trim(), ...prev.gratitudeList].slice(0, 20),
       coins: prev.coins + 15
     }));
+    playSound('coin');
+    setSpeechText("Alhamdulillah... senangnya mendengarnya.");
   };
 
   const interact = (type: 'pet' | 'feed' | 'hug') => {
@@ -125,6 +153,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       return { ...prev, moodScore: newMood, coins: newCoins };
     });
+    playSound('pop');
   };
 
   const claimDaily = () => {
@@ -142,6 +171,8 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const watchAd = () => {
       setState(prev => ({ ...prev, coins: prev.coins + 50 }));
+      playSound('coin');
+      setSpeechText("Cuan cuan cuan! 💰");
   };
 
   if (!loaded) return null;
@@ -155,7 +186,9 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
       saveGratitude,
       interact,
       claimDaily,
-      watchAd
+      watchAd,
+      speechText,
+      setSpeechText
     }}>
       {children}
     </GameContext.Provider>

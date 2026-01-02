@@ -84,6 +84,10 @@ Best Practice: Create a services/ai.ts file.
 
 Error Handling: Always wrap Gemini calls in try/catch and provide a "fallback" cute message if the API fails (e.g., "Sinyal bebek hilang... Kwek?").
 
+Implementation Detail:
+Use `@google/generative-ai`.
+Maintain a simple conversation history for the Chat context.
+
 6. Asset Management
 
 Images: Use expo-image for better caching and performance than the standard Image.
@@ -93,10 +97,11 @@ SVGs: Use react-native-svg and lucide-react-native for icons. Do NOT try to use 
 7. Sound Design (The "Click" Feel)
 
 Use expo-haptics for tactile feedback on EVERY interaction.
+Use `expo-av` for Audio.
 
-Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light) for taps.
-
-Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success) for completing a habit.
+Pattern: "Fire and Forget Sound"
+Create a helper `playSound('pop')`.
+Load sounds asynchronously but play them instantly. Handle errors gracefully (if sound fails, app shouldn't crash).
 
 8. Modal Architecture (New)
 

@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
-import { Image, View } from 'react-native';
-import Animated, { useSharedValue, useAnimatedStyle, withRepeat, withSequence, withTiming, Easing } from 'react-native-reanimated';
-import { Mood } from '../types';
+import { Image, View, Text } from 'react-native';
+import Animated, { useSharedValue, useAnimatedStyle, withRepeat, withSequence, withTiming, Easing, withSpring } from 'react-native-reanimated';
+import { useGame } from '../context/GameContext';
 
 interface PetAvatarProps {
   moodScore: number;
@@ -13,8 +13,23 @@ const IMAGES = {
   sad: 'https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExM2Q5Z255bmY5bmY5bmY5bmY5bmY5bmY5bmY5bmY5bmY5bmY5ZiZlcD12MV9zdGlja2Vyc19zZWFyY2gmY3Q9cw/OPU6pZ2CV29Zm/giphy.gif'
 };
 
+import { ViewStyle, TextStyle, DimensionValue } from 'react-native';
+
+type AccessoryStyle = {
+    emoji: string;
+    style: TextStyle;
+};
+
+const ACCESSORIES: Record<string, AccessoryStyle> = {
+    tea: { emoji: '🍵', style: { bottom: 10, right: 20, fontSize: 50, transform: [{rotate: '0deg'}] } },
+    blanket: { emoji: '🧣', style: { bottom: 0, left: '50%' as DimensionValue, marginLeft: -40, fontSize: 80 } },
+    headphones: { emoji: '🎧', style: { top: '25%' as DimensionValue, left: '50%' as DimensionValue, marginLeft: -50, fontSize: 90, transform: [{rotate: '10deg'}] } },
+};
+
 export const PetAvatar: React.FC<PetAvatarProps> = ({ moodScore }) => {
+  const { accessory } = useGame();
   const scale = useSharedValue(1);
+  const translateY = useSharedValue(0);
 
   // Determine mood string
   let mood: 'happy' | 'neutral' | 'sad' = 'neutral';
@@ -34,20 +49,23 @@ export const PetAvatar: React.FC<PetAvatarProps> = ({ moodScore }) => {
   }, []);
 
   const animatedStyle = useAnimatedStyle(() => ({
-    transform: [{ scale: scale.value }]
+    transform: [{ scale: scale.value }, { translateY: translateY.value }]
   }));
 
+  const accConfig = ACCESSORIES[accessory as keyof typeof ACCESSORIES];
+
   return (
-    <Animated.View style={[animatedStyle, { width: 288, height: 288 }]}>
+    <Animated.View style={[animatedStyle, { width: 288, height: 288, position: 'relative' }]}>
        <Image
          source={{ uri: IMAGES[mood] }}
          style={{ width: '100%', height: '100%', resizeMode: 'contain' }}
-         // Note: For pixel art scaling in RN, we rely on resizeMode or style.
-         // RN doesn't have 'imageRendering: pixelated' style prop directly on Image like web,
-         // but 'contain' usually works well enough or we might need a specific prop on Android/iOS.
-         // resizeMethod="resize" might help on Android.
          resizeMethod="resize"
        />
+       {accConfig && (
+           <Text style={[{ position: 'absolute', zIndex: 10 }, accConfig.style]}>
+               {accConfig.emoji}
+           </Text>
+       )}
     </Animated.View>
   );
 };
