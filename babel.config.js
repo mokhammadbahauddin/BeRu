@@ -2,6 +2,10 @@ module.exports = function(api) {
   api.cache(true);
   return {
     presets: ['babel-preset-expo'],
-    plugins: ["nativewind/babel", "react-native-reanimated/plugin"],
+    plugins: [
+      // Only include nativewind/babel in non-test environments if it causes issues
+      process.env.NODE_ENV !== 'test' ? "nativewind/babel" : null,
+      "react-native-reanimated/plugin"
+    ].filter(Boolean),
   };
 };
