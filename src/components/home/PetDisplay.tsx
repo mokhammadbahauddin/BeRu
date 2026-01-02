@@ -60,7 +60,7 @@ export const PetDisplay: React.FC<PetDisplayProps> = ({ onInteract, onPetPress }
              </View>
            )}
 
-           <JuicyButton onPress={handlePress} className="active:scale-95">
+           <JuicyButton onPress={handlePress}>
               <PetAvatar moodScore={moodScore} />
            </JuicyButton>
 
